@@ -16,23 +16,32 @@ public class CogScript : MonoBehaviour
 
     private IEnumerator Break()
     {
-        float time = Random.Range(4f, 8f);
+        float time = Random.Range(1f, 3.5f);
         yield return new WaitForSeconds(time);
         GetComponent<SpriteRenderer>().color = broken;
+        BreakManager.numOfBrokenCogs++;
+        if(BreakManager.numOfBrokenCogs == 4)
+        {
+            GameManager.loseState = true;
+        }
         BrokenStage++;
     }
 
     public void FixCog()
     {
-        StopCoroutine(Break());
+        StopAllCoroutines();
         if(BrokenStage > 0)
             BrokenStage--;
 
-        if(BrokenStage == 1)
+        if (BrokenStage == 1)
+        {
+            BreakManager.numOfBrokenCogs--;
             Deteriorate();
+        }
+
         else if(BrokenStage == 0)
         {
-            GetComponent<SpriteRenderer>().color = GameManager.OnColor;
+            GetComponent<SpriteRenderer>().color = GameManager.OffColor;
             bm.AddCog(gameObject);
         }
     }
