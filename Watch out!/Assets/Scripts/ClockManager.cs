@@ -9,7 +9,9 @@ public class ClockManager : MonoBehaviour
     [SerializeField] private float tickSpeed = 1f;
     [SerializeField] private GameObject clockTrigger;
     public static bool TimeIsTwelwe = false;
+    public static bool ClockHasBeenRung = false;
     private int currentTime;
+    private bool firstDoesntCount = true;
 
     private void Start()
     {
@@ -34,6 +36,16 @@ public class ClockManager : MonoBehaviour
     {
         yield return new WaitForSeconds(tickSpeed);
         hands[currentTime].GetComponent<SpriteRenderer>().color = GameManager.OffColor;
+
+        if (!firstDoesntCount)
+        {
+            if (currentTime == 0 && !ClockHasBeenRung)
+            {
+                GameManager.GivePenalty();
+            }
+            else { ClockHasBeenRung = false; }
+        }
+        else { firstDoesntCount = false; }
 
         if(currentTime < 11)
             currentTime++;
