@@ -8,11 +8,13 @@ public class BreakManager : MonoBehaviour
     [SerializeField] private float minTime = 1f;
     [SerializeField] private float maxTime = 4f;
     [SerializeField] private List<GameObject> cogs = new List<GameObject>();
-    private List<GameObject> intactCogs = new List<GameObject>();
+    public static List<GameObject> intactCogs = new List<GameObject>();
+    public static int numOfBrokenCogs = 0;
 
     private void Start()
     {
         intactCogs = cogs;
+        numOfBrokenCogs = 0;
         StartCoroutine(Break());
     }
 
@@ -28,7 +30,7 @@ public class BreakManager : MonoBehaviour
         cs.Deteriorate();
         intactCogs.RemoveAt(randomCog);
 
-        if(intactCogs.Any() && cs.BrokenStage == 0)
+        if(intactCogs.Any())
         {
             StartCoroutine(Break());
         }
