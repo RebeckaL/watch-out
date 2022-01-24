@@ -21,7 +21,7 @@ public class ClockManager : MonoBehaviour
 
     private void Start()
     {
-        ChangeTickTime();
+        TimeManager.ChangeTickTime();
         for(int i = 0; i < hands.Count; i++)
         {
             if(i != 0)
@@ -41,8 +41,8 @@ public class ClockManager : MonoBehaviour
 
     private IEnumerator Tick()
     {
-        ChangeTickTime();
-        yield return new WaitForSeconds(actualTickSpeed);
+        TimeManager.ChangeTickTime();
+        yield return new WaitForSeconds(TimeManager.tickTime);
         hands[currentTime].GetComponent<SpriteRenderer>().color = GameManager.OffColor;
 
         if (!firstDoesntCount)
@@ -69,14 +69,5 @@ public class ClockManager : MonoBehaviour
             SoundManager.PlaySound(tick);
         }
         StartCoroutine(Tick());
-    }
-
-    private void ChangeTickTime()
-    {
-        if(BreakManager.numOfBrokenCogs > 0)
-        {
-            actualTickSpeed = tickSpeed - (0.25f * BreakManager.numOfBrokenCogs);
-        }
-        else { actualTickSpeed = tickSpeed; }
     }
 }
