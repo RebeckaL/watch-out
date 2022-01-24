@@ -9,12 +9,14 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private GameObject start;
     [SerializeField] private AudioClip bing, bong;
     [SerializeField] private List<GameObject> soundMarkers = new List<GameObject>();
-    private bool byBell, byCog;
+    [SerializeField] private BreakManager bm;
+    private bool byBell, byCog, firstRing;
     private GameObject currentCog;
 
     private void Start()
     {
         EventSystem.current.SetSelectedGameObject(start);
+        firstRing = true;
     }
 
     private void Update()
@@ -45,8 +47,19 @@ public class PlayerScript : MonoBehaviour
         {
             if (ClockManager.TimeIsTwelwe)
             {
-                ClockManager.ClockHasBeenRung = true;
+                if (!ClockManager.ClockHasBeenRung)
+                {
+                    ClockManager.ClockHasBeenRung = true;
+                    ScoreManager.UpdateScore(10);
+                    TimeManager.IncreaseTickSpeed();
+                    if (firstRing)
+                    {
+                        bm.StartBreaking();
+                        firstRing = false;
+                    }
+                }
             }
+            else { ScoreManager.UpdateScore(-5); }
             RingBell();
         }
     }

@@ -5,8 +5,6 @@ using System.Linq;
 
 public class BreakManager : MonoBehaviour
 {
-    [SerializeField] private float minTime = 1f;
-    [SerializeField] private float maxTime = 4f;
     [SerializeField] private List<GameObject> cogs = new List<GameObject>();
     public static List<GameObject> intactCogs = new List<GameObject>();
     public static int numOfBrokenCogs = 0;
@@ -15,12 +13,16 @@ public class BreakManager : MonoBehaviour
     {
         intactCogs = cogs;
         numOfBrokenCogs = 0;
+    }
+
+    public void StartBreaking()
+    {
         StartCoroutine(Break());
     }
 
     private IEnumerator Break()
     {
-        float time = Random.Range(minTime, maxTime);
+        float time = Random.Range(TimeManager.MinTimeBreak, TimeManager.MaxTimeBreak);
 
         yield return new WaitForSeconds(time);
 

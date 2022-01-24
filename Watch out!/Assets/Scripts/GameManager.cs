@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     {
         OnColor = onColor;
         OffColor = offColor;
+
+        misses = 0;
         missSprites = tries;
         foreach(GameObject miss in missSprites)
         {
@@ -49,15 +51,12 @@ public class GameManager : MonoBehaviour
 
     public static void GivePenalty()
     {
-        if (misses < 3)
-        {
-            missSprites[misses].GetComponent<Image>().color = OnColor;
-        }
-        else
+        misses++;
+        missSprites[misses - 1].GetComponent<Image>().color = OnColor;
+        if(misses == 3)
         {
             lossMessage.SetActive(true);
             loseState = true;
         }
-        misses++;
     }
 }
