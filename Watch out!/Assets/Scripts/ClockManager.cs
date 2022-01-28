@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class ClockManager : MonoBehaviour
 {
     [SerializeField] private List<GameObject> hands = new List<GameObject>();
-    [SerializeField] private float tickSpeed = 1f;
     private float actualTickSpeed;
     [SerializeField] private GameObject clockTrigger;
 

@@ -11,7 +11,6 @@ public class CogScript : MonoBehaviour
     public void Deteriorate()
     {
         GetComponent<SpriteRenderer>().color = bad;
-        Debug.Log(gameObject.name + " is breaking");
         StartCoroutine(Break());
     }
 
