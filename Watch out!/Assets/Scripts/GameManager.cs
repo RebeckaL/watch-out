@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,8 +16,13 @@ public class GameManager : MonoBehaviour
     private static List<GameObject> missSprites = new List<GameObject>();
     private static int misses = 0;
     [SerializeField] private GameObject loss;
-    private static GameObject lossMessage;
+    [SerializeField] private AudioClip loseSound, pauseSound;
+    [SerializeField] private GameObject player, eventsystem;
+    private GameObject lossMessage;
     public static bool loseState = false;
+    private bool soundHasBeenPlayed = false;
+    private bool paused;
+    
     private void Start()
     {
         OnColor = onColor;
@@ -35,16 +41,40 @@ public class GameManager : MonoBehaviour
     {
         if (loseState)
         {
+            if (!soundHasBeenPlayed)
+            {
+                SoundManager.PlaySound(loseSound);
+                LeanTween.moveY(loss.GetComponent<RectTransform>(), 0, 1f).setIgnoreTimeScale(true);
+                soundHasBeenPlayed = true;
+            }
             Time.timeScale = 0;
-            lossMessage.SetActive(true);
-            if (Keyboard.current[Key.R].wasPressedThisFrame)
+        }
+
+        if (Keyboard.current[Key.R].wasPressedThisFrame)
+        {
+            Time.timeScale = 1f;
+            lossMessage.SetActive(false);
+            loseState = false;
+            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(scene.name);
+        }
+
+        if (Keyboard.current[Key.P].wasPressedThisFrame)
+        {
+            if (paused)
             {
                 Time.timeScale = 1f;
-                lossMessage.SetActive(false);
-                loseState = false;
-                Scene scene = SceneManager.GetActiveScene();
-                SceneManager.LoadScene(scene.name);
+                eventsystem.GetComponent<EventSystem>().sendNavigationEvents = true;
             }
+
+            else
+            {
+                Time.timeScale = 0f;
+                eventsystem.GetComponent<EventSystem>().sendNavigationEvents = false;
+                
+            }
+            SoundManager.PlaySound(pauseSound);
+            paused = !paused;
         }
     }
 
@@ -55,8 +85,13 @@ public class GameManager : MonoBehaviour
         missSprites[misses - 1].GetComponent<Image>().color = OnColor;
         if(misses == 3)
         {
-            lossMessage.SetActive(true);
             loseState = true;
         }
+    }
+
+    private IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(5f);
+        GetComponent<AudioSource>().Play();
     }
 }

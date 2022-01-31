@@ -10,8 +10,12 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private AudioClip bing, bong;
     [SerializeField] private List<GameObject> soundMarkers = new List<GameObject>();
     [SerializeField] private BreakManager bm;
+    [SerializeField] private BirdScript birds;
+    [SerializeField] private BellScript bell;
     private bool byBell, byCog, firstRing;
     private GameObject currentCog;
+    [SerializeField] private GameObject[] boos = new GameObject[2];
+    [SerializeField] private AudioClip boo;
 
     private void Start()
     {
@@ -21,14 +25,17 @@ public class PlayerScript : MonoBehaviour
 
     private void Update()
     {
-        Move();
-        if (byBell)
+        if(Time.timeScale != 0)
         {
-            BongBell();
-        }
-        else if (byCog)
-        {
-            FixCog();
+            Move();
+            if (byBell)
+            {
+                BongBell();
+            }
+            else if (byCog)
+            {
+                FixCog();
+            }
         }
     }
 
@@ -45,6 +52,7 @@ public class PlayerScript : MonoBehaviour
     {
         if(Keyboard.current[Key.Space].wasPressedThisFrame)
         {
+            bool missed = false;
             if (ClockManager.TimeIsTwelwe)
             {
                 if (!ClockManager.ClockHasBeenRung)
@@ -59,8 +67,23 @@ public class PlayerScript : MonoBehaviour
                     }
                 }
             }
-            else { ScoreManager.UpdateScore(-5); }
-            RingBell();
+            else
+            {
+                ScoreManager.UpdateScore(-5);
+                int i = Random.Range(0, 2);
+                GameObject currBoo = boos[i];
+                currBoo.GetComponent<SpriteRenderer>().color = GameManager.OnColor;
+                StartCoroutine(ChangeSpriteColor(currBoo, 1f));
+                missed = true;
+            }
+            GameObject obj = EventSystem.current.currentSelectedGameObject;
+            obj.GetComponent<SpriteContainer>().ChangeSprite();
+            if (birds.isSitting)
+            {
+                birds.Fly();
+            }
+            bell.Swing();
+            RingBell(missed);
         }
     }
 
@@ -69,6 +92,8 @@ public class PlayerScript : MonoBehaviour
         if (Keyboard.current[Key.Space].wasPressedThisFrame)
         {
             currentCog.GetComponent<CogScript>().FixCog();
+            GameObject obj = EventSystem.current.currentSelectedGameObject;
+            obj.GetComponent<SpriteContainer>().ChangeSprite();
         }
     }
 
@@ -98,11 +123,19 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    public void RingBell()
+    public void RingBell(bool missed)
     {
         float delay = 0.4f;
-        List<AudioClip> rings = new List<AudioClip> { bing, bong };
-        StartCoroutine(SoundManager.PlayNextSound(rings, delay));
+        if (!missed)
+        {
+            List<AudioClip> rings = new List<AudioClip> { bing, bong };
+            StartCoroutine(SoundManager.PlayNextSound(rings, delay));
+        }
+        else
+        {
+            List<AudioClip> wrongSound = new List<AudioClip> { bing, boo };
+            StartCoroutine(SoundManager.PlayNextSound(wrongSound, delay));
+        }
         soundMarkers[0].GetComponent<SpriteRenderer>().color = GameManager.OnColor;
         soundMarkers[1].GetComponent<SpriteRenderer>().color = GameManager.OnColor;
         StartCoroutine(Ring(delay));
@@ -121,5 +154,11 @@ public class PlayerScript : MonoBehaviour
         soundMarkers[0].GetComponent<SpriteRenderer>().color = GameManager.OffColor;
         soundMarkers[1].GetComponent<SpriteRenderer>().color = GameManager.OffColor;
         soundMarkers[2].GetComponent<SpriteRenderer>().color = GameManager.OffColor;
+    }
+
+    private IEnumerator ChangeSpriteColor(GameObject sprite, float time)
+    {
+        yield return new WaitForSeconds(time);
+        sprite.GetComponent<SpriteRenderer>().color = GameManager.OffColor;
     }
 }

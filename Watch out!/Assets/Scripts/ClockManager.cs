@@ -29,13 +29,14 @@ public class ClockManager : MonoBehaviour
             }
         }
         currentTime = 0;
-        RotateTrigger();
         StartCoroutine(Tick());
     }
 
     private void RotateTrigger()
     {
-        clockTrigger.transform.rotation = hands[currentTime].transform.rotation;
+        Vector3 q = clockTrigger.transform.rotation.eulerAngles;
+        q.z -= 30;
+        clockTrigger.transform.eulerAngles = q;
     }
 
     private IEnumerator Tick()

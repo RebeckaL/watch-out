@@ -50,8 +50,8 @@ public class TimeManager : MonoBehaviour
 
     public static void IncreaseTickSpeed()
     {
-        if(standardTickTime > startTickTime / 3)
-            standardTickTime -= startTickTime / 30;
+        if(standardTickTime > startTickTime / 2.5)
+            standardTickTime -= startTickTime / 40;
         ChangeTickTime();
     }
 
